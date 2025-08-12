@@ -1,27 +1,30 @@
-// composables/useLaunchFilter.ts
-import { ref, computed } from 'vue'
+import { ref, computed, type ComputedRef } from 'vue'
 
-export function useLaunchFilter(launches: any[]) {
-  const selectedYear = ref<string | null>(null)
+export function useLaunchFilter(launches: ComputedRef<any[]>) {
+  const selectedYear = ref<string>('All') 
 
-  
   const years = computed(() => {
-    const allYears = launches.map(launch => new Date(launch.launch_date_utc).getFullYear())
-    return Array.from(new Set(allYears)).sort((a, b) => b - a) 
+    const rawLaunches = launches.value ?? []
+    const allYears = rawLaunches
+      .map(launch => new Date(launch.launch_date_utc).getFullYear().toString())
+    return Array.from(new Set(allYears)).sort((a, b) => parseInt(b) - parseInt(a))
   })
 
- 
   const filteredLaunches = computed(() => {
-    if (!selectedYear.value) return launches
-    return launches.filter(launch => {
-      const launchYear = new Date(launch.launch_date_utc).getFullYear()
-      return launchYear.toString() === selectedYear.value
+    const rawLaunches = launches.value ?? []
+
+    if (!selectedYear.value || selectedYear.value === 'All') {
+      return rawLaunches
+    }
+
+    return rawLaunches.filter(launch => {
+      const launchYear = new Date(launch.launch_date_utc).getFullYear().toString()
+      return launchYear === selectedYear.value
     })
   })
 
-  
   function clearFilter() {
-    selectedYear.value = null
+    selectedYear.value = 'All'
   }
 
   return {

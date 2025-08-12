@@ -8,6 +8,30 @@
       </v-toolbar-title>
     </v-toolbar>
 
+    <v-row justify="center" class="mb-4">
+      <v-col cols="12" md="6" class="d-flex align-center justify-space-between">
+        <v-select
+          v-model="selectedYear"
+          :items="['All', ...years]"
+          label="Filter by Year"
+          hide-details
+          dense
+          outlined
+          style="max-width: 180px;"
+        />
+        <v-btn text color="cyan lighten-3" @click="clearFilter">Clear Filter</v-btn>
+
+        <v-btn
+          color="cyan lighten-3"
+          @click="toggleSortOrder"
+          class="ml-4"
+          outlined
+        >
+          Sort: {{ sortOrder.toUpperCase() }}
+          <v-icon right>{{ sortOrder === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
 
     <v-row v-if="loading" justify="center" class="status-row">
       <v-col cols="12" md="6" class="text-center">
@@ -16,7 +40,6 @@
       </v-col>
     </v-row>
 
- 
     <v-row v-else-if="error" justify="center" class="status-row">
       <v-col cols="12" md="6" class="text-center error-text">
         <v-icon x-large>mdi-alert-circle-outline</v-icon>
@@ -25,10 +48,9 @@
       </v-col>
     </v-row>
 
-
     <v-row v-else dense>
       <v-col
-        v-for="launch in launches"
+        v-for="launch in sortedLaunches"
         :key="launch.id"
         cols="12"
         sm="6"
@@ -98,7 +120,6 @@
       </v-col>
     </v-row>
 
-
     <v-dialog v-model="dialog" max-width="600px">
       <v-card>
         <v-card-title class="headline">{{ selectedLaunch?.mission_name }}</v-card-title>
@@ -119,18 +140,13 @@
 </template>
 
 <script setup lang="ts">
-
-import '@/assets/css/LaunchesPage.css'  
+import '@/assets/css/LaunchesPage.css'
 import { ref, computed } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 
 import { useLaunchFilter } from '../../composables/useLaunchFilter'
-
-
-
-
-
+import { useLaunchSort  } from '../../composables/useLaunchSort'
 
 interface Launch {
   id: string
@@ -145,7 +161,6 @@ interface Launch {
   details?: string
 }
 
-// GraphQL query
 const GET_LAUNCHES = gql`
   query GetLaunches {
     launchesPast(limit: 20) {
@@ -166,11 +181,13 @@ const GET_LAUNCHES = gql`
 const { result, loading, error } = useQuery(GET_LAUNCHES)
 
 const launches = computed<Launch[]>(() => result.value?.launchesPast || [])
-const { selectedYear, years, filteredLaunches, clearFilter } = useLaunchFilter(launches.value)
 
+
+const { selectedYear, years, filteredLaunches, clearFilter } = useLaunchFilter(launches)
+const { sortOrder, sortedLaunches, toggleSortOrder } = useLaunchSort(filteredLaunches)
 
 const dialog = ref(false)
-const selectedLaunch: Ref<Launch | null> = ref(null)
+const selectedLaunch = ref<Launch | null>(null)
 
 function openDetails(launch: Launch) {
   selectedLaunch.value = launch
