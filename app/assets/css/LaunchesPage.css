@@ -32,17 +32,18 @@
 
 .launch-card {
   border-radius: 20px;
-  background: rgba(0, 188, 212, 0.1);
+  background: rgba(0, 188, 212, 0.2) !important;
   color: #e0f7fa;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   min-height: 350px;
+  box-shadow: 0 10px 30px rgba(57, 100, 106, 0.5) !important;
+  transform: translateY(0); 
 }
 
 .launch-card:hover {
-  background: rgba(0, 188, 212, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 188, 212, 0.5);
+
   transform: translateY(-8px);
 }
 

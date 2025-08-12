@@ -125,6 +125,12 @@ import { ref, computed } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 
+import { useLaunchFilter } from '../../composables/useLaunchFilter'
+
+
+
+
+
 
 interface Launch {
   id: string
@@ -160,8 +166,9 @@ const GET_LAUNCHES = gql`
 const { result, loading, error } = useQuery(GET_LAUNCHES)
 
 const launches = computed<Launch[]>(() => result.value?.launchesPast || [])
+const { selectedYear, years, filteredLaunches, clearFilter } = useLaunchFilter(launches.value)
 
-// Dialog state and selected launch with proper typing
+
 const dialog = ref(false)
 const selectedLaunch: Ref<Launch | null> = ref(null)
 
