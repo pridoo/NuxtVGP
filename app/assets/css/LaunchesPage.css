@@ -1,0 +1,107 @@
+/* launches.css */
+.launches-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  padding: 32px 16px;
+  color: #e0f7fa;
+  font-family: 'Roboto', sans-serif;
+}
+
+.toolbar {
+  background: transparent !important;
+  box-shadow: none !important;
+  margin-bottom: 32px;
+}
+
+.title-text {
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00bcd4;
+  user-select: none;
+}
+
+.status-row {
+  margin-top: 10vh;
+}
+
+.error-text {
+  color: #f44336 !important;
+}
+
+.launch-card {
+  border-radius: 20px;
+  background: rgba(0, 188, 212, 0.1);
+  color: #e0f7fa;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 350px;
+}
+
+.launch-card:hover {
+  background: rgba(0, 188, 212, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 188, 212, 0.5);
+  transform: translateY(-8px);
+}
+
+.card-header {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #00acc1;
+  align-items: center;
+}
+
+.launch-date {
+  font-style: italic;
+  font-size: 0.875rem;
+  color: #b2ebf2;
+  margin-bottom: 16px;
+}
+
+.card-content {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.details-text {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  white-space: normal;
+  color: #b2ebf2;
+}
+
+.no-details {
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.actions {
+  justify-content: flex-end;
+  padding-right: 16px;
+}
+
+.v-chip {
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.v-chip .v-icon {
+  margin-right: 4px;
+}
+
+.v-btn {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background-color 0.3s ease;
+}
+
+.v-btn:hover {
+  background-color: #00acc1 !important;
+  color: #fff !important;
+}
