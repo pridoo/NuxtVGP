@@ -1,9 +1,23 @@
 <template>
-  <v-dialog v-model="show" max-width="600px" transition="dialog-bottom-transition">
+  <v-dialog
+    :model-value="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    max-width="600px"
+    transition="dialog-bottom-transition"
+  >
     <v-card class="rocket-modal-card glass-card pa-5">
       <v-card-title class="modal-title d-flex align-center mb-2">
         <v-icon left color="cyan lighten-3" large>mdi-rocket</v-icon>
         <span>{{ rocket?.name }}</span>
+        <v-spacer />
+        <v-btn
+          icon
+          :color="isFavorite ? 'red' : 'grey'"
+          @click="toggleFavorite"
+          :title="isFavorite ? 'Remove from favorites' : 'Add to favorites'"
+        >
+          <v-icon>{{ isFavorite ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
+        </v-btn>
       </v-card-title>
 
       <v-card-subtitle class="modal-subtitle mb-4">
@@ -36,11 +50,7 @@
       </v-card-text>
 
       <v-card-actions class="justify-end">
-        <v-btn
-          color="red lighten-2"
-          text
-          @click="close"
-        >
+        <v-btn color="red lighten-2" text @click="$emit('update:modelValue', false)">
           <v-icon left>mdi-close</v-icon>Close
         </v-btn>
       </v-card-actions>
@@ -48,32 +58,29 @@
   </v-dialog>
 </template>
 
+
 <script setup lang="ts">
-import { defineProps, defineEmits, watch, ref } from 'vue'
+import { computed } from 'vue'
+import { useFavoritesStore } from '@/stores/favorites'
 
-interface Rocket {
-  id: string
-  name: string
-  description: string
-  first_flight: string
-  height: { meters: number }
-  diameter: { meters: number }
-  mass: { kg: number }
-  stages: number
-}
-
-const props = defineProps<{ rocket: Rocket | null, modelValue: boolean }>()
+const props = defineProps({
+  modelValue: Boolean,
+  rocket: Object as () => Rocket | null
+})
 const emit = defineEmits(['update:modelValue'])
 
-const show = ref(props.modelValue)
+const favoritesStore = useFavoritesStore()
 
-watch(() => props.modelValue, (val) => {
-  show.value = val
+const isFavorite = computed(() => {
+  if (!props.rocket) return false
+  return favoritesStore.isFavorite(props.rocket.id)
 })
 
-watch(show, (val) => {
-  emit('update:modelValue', val)
-})
+function toggleFavorite() {
+  if (props.rocket) {
+    favoritesStore.toggleFavorite(props.rocket)
+  }
+}
 
 function formatDate(dateString: string | undefined) {
   if (!dateString) return 'Unknown date'
@@ -83,9 +90,5 @@ function formatDate(dateString: string | undefined) {
     day: 'numeric',
   }
   return new Date(dateString).toLocaleDateString(undefined, options)
-}
-
-function close() {
-  show.value = false
 }
 </script>

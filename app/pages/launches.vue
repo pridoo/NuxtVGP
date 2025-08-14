@@ -1,12 +1,5 @@
 <template>
   <v-container class="launches-container" fluid>
-    <v-toolbar flat class="toolbar">
-      <v-toolbar-title>
-        <v-icon left large>mdi-rocket-launch</v-icon>
-        <span class="title-text">SpaceX Launches</span>
-      </v-toolbar-title>
-    </v-toolbar>
-
     
     <v-row justify="center" class="mb-4" align="center" dense>
       <v-col cols="12" md="3" class="d-flex justify-center">
