@@ -1,6 +1,5 @@
 <template>
   <v-container class="launches-container" fluid>
-   
     <v-toolbar flat class="toolbar">
       <v-toolbar-title>
         <v-icon left large>mdi-rocket-launch</v-icon>
@@ -33,18 +32,18 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="loading" justify="center" class="status-row">
+    <v-row v-if="loading || rocketsLoading" justify="center" class="status-row">
       <v-col cols="12" md="6" class="text-center">
         <v-progress-circular indeterminate color="cyan lighten-3" size="64" />
-        <div class="mt-4 subtitle-1">Fetching launches...</div>
+        <div class="mt-4 subtitle-1">Fetching launches and rockets...</div>
       </v-col>
     </v-row>
 
-    <v-row v-else-if="error" justify="center" class="status-row">
+    <v-row v-else-if="error || rocketsError" justify="center" class="status-row">
       <v-col cols="12" md="6" class="text-center error-text">
         <v-icon x-large>mdi-alert-circle-outline</v-icon>
-        <div class="mt-2 headline">Oops! Could not load launches</div>
-        <div>{{ error.message }}</div>
+        <div class="mt-2 headline">Oops! Could not load data</div>
+        <div>{{ error?.message || rocketsError?.message }}</div>
       </v-col>
     </v-row>
 
@@ -65,11 +64,11 @@
         >
           <v-card-title class="card-header">
             <v-icon left color="cyan lighten-3" large>mdi-earth</v-icon>
-            <span>{{ launch.mission_name }}</span>
+            <span>{{ launch.mission_name || 'No Mission Name' }}</span>
           </v-card-title>
 
           <v-card-subtitle class="launch-date">
-            {{ formatDate(launch.launch_date_utc) }}
+            {{ formatDate(launch.launch_date_utc) || 'Unknown Date' }}
           </v-card-subtitle>
 
           <v-card-text class="card-content flex-grow-1 d-flex flex-column justify-space-between">
@@ -120,22 +119,56 @@
       </v-col>
     </v-row>
 
-    <v-dialog v-model="dialog" max-width="600px">
-      <v-card>
-        <v-card-title class="headline">{{ selectedLaunch?.mission_name }}</v-card-title>
-        <v-card-subtitle>{{ formatDate(selectedLaunch?.launch_date_utc) }}</v-card-subtitle>
-        <v-card-text>
-          <p><strong>Launch Site:</strong> {{ selectedLaunch?.launch_site?.site_name_long || 'Unknown Site' }}</p>
-          <p><strong>Rocket:</strong> {{ selectedLaunch?.rocket?.rocket_name || 'Unknown Rocket' }}</p>
-          <p><strong>Details:</strong></p>
-          <p>{{ selectedLaunch?.details || 'No details available.' }}</p>
+
+
+    <v-dialog v-model="showDialog" max-width="600px" transition="dialog-bottom-transition">
+      <v-card class="rocket-modal-card glass-card pa-5">
+        <v-card-title class="modal-title d-flex align-center mb-2">
+          <v-icon left color="cyan lighten-3" large>mdi-rocket</v-icon>
+          <span>{{ rocket?.name }}</span>
+        </v-card-title>
+
+        <v-card-subtitle class="modal-subtitle mb-4">
+          {{ rocket?.description }}
+        </v-card-subtitle>
+
+        <v-card-text class="modal-body-text">
+          <v-row dense>
+            <v-col cols="6">
+              <strong>First Flight:</strong><br />
+              {{ formatDate(rocket?.first_flight) }}
+            </v-col>
+            <v-col cols="6">
+              <strong>Stages:</strong><br />
+              {{ rocket?.stages }}
+            </v-col>
+            <v-col cols="6">
+              <strong>Height:</strong><br />
+              {{ rocket?.height?.meters }} m
+            </v-col>
+            <v-col cols="6">
+              <strong>Diameter:</strong><br />
+              {{ rocket?.diameter?.meters }} m
+            </v-col>
+            <v-col cols="12">
+              <strong>Mass:</strong><br />
+              {{ rocket?.mass?.kg }} kg
+            </v-col>
+          </v-row>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="dialog = false">Close</v-btn>
+
+        <v-card-actions class="justify-end">
+          <v-btn
+            color="red lighten-2"
+            text
+            @click="showDialog = false"
+          >
+            <v-icon left>mdi-close</v-icon>Close
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </v-container>
 </template>
 
@@ -146,7 +179,8 @@ import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 
 import { useLaunchFilter } from '../../composables/useLaunchFilter'
-import { useLaunchSort  } from '../../composables/useLaunchSort'
+import { useLaunchSort } from '../../composables/useLaunchSort'
+import { useRouter } from 'vue-router'
 
 interface Launch {
   id: string
@@ -159,6 +193,17 @@ interface Launch {
     rocket_name: string
   }
   details?: string
+}
+
+interface Rocket {
+  id: string
+  name: string
+  description: string
+  first_flight: string
+  height: { meters: number }
+  diameter: { meters: number }
+  mass: { kg: number }
+  stages: number
 }
 
 const GET_LAUNCHES = gql`
@@ -178,20 +223,63 @@ const GET_LAUNCHES = gql`
   }
 `
 
-const { result, loading, error } = useQuery(GET_LAUNCHES)
+const GET_ALL_ROCKETS = gql`
+  query GetAllRockets {
+    rockets {
+      id
+      name
+      description
+      first_flight
+      height {
+        meters
+      }
+      diameter {
+        meters
+      }
+      mass {
+        kg
+      }
+      stages
+    }
+  }
+`
 
+
+const { result, loading, error } = useQuery(GET_LAUNCHES)
 const launches = computed<Launch[]>(() => result.value?.launchesPast || [])
 
+
+const { result: rocketsResult, loading: rocketsLoading, error: rocketsError } = useQuery(GET_ALL_ROCKETS)
+const rocketsByName = computed(() => {
+  const rockets = rocketsResult.value?.rockets || []
+  const map = new Map<string, Rocket>()
+  rockets.forEach((r: Rocket) => {
+    map.set(r.name, r)
+  })
+  return map
+})
 
 const { selectedYear, years, filteredLaunches, clearFilter } = useLaunchFilter(launches)
 const { sortOrder, sortedLaunches, toggleSortOrder } = useLaunchSort(filteredLaunches)
 
-const dialog = ref(false)
-const selectedLaunch = ref<Launch | null>(null)
+const router = useRouter()
+
+// Modal control and selected rocket data
+const showDialog = ref(false)
+const rocket = ref<Rocket | null>(null)
 
 function openDetails(launch: Launch) {
-  selectedLaunch.value = launch
-  dialog.value = true
+  if (!launch.rocket?.rocket_name) {
+    alert('Rocket data not available')
+    return
+  }
+  const r = rocketsByName.value.get(launch.rocket.rocket_name)
+  if (!r) {
+    alert('Rocket details not found')
+    return
+  }
+  rocket.value = r
+  showDialog.value = true
 }
 
 function formatDate(dateString: string | undefined) {
@@ -211,3 +299,5 @@ function truncateText(text: string, length: number) {
   return text.slice(0, length) + '...'
 }
 </script>
+
+

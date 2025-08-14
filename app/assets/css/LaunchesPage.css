@@ -106,3 +106,46 @@
   background-color: #00acc1 !important;
   color: #fff !important;
 }
+
+
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e0f7fa;
+  box-shadow: 0 12px 40px rgba(0, 188, 212, 0.2);
+  transition: all 0.3s ease;
+}
+
+.rocket-modal-card .modal-title {
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #00e5ff;
+  letter-spacing: 1px;
+}
+
+.rocket-modal-card .modal-subtitle {
+  color: #b2ebf2;
+  font-style: italic;
+}
+
+.rocket-modal-card .modal-body-text {
+  font-size: 0.95rem;
+  color: #e0f7fa;
+  line-height: 1.6;
+}
+
+.rocket-modal-card .v-btn {
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rocket-modal-card .v-btn:hover {
+  background-color: #ff5252 !important;
+  color: white !important;
+}
+
