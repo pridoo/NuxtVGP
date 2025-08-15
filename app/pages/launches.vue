@@ -1,6 +1,39 @@
 <template>
   <v-container class="launches-container" fluid>
-    
+      <v-row justify="center" class="mb-8">
+      <v-col cols="12" md="6" class="d-flex justify-center">
+        <v-btn
+          color="cyan lighten-1"
+          dark
+          large
+          @click="showCountdown = true"
+          class="text-uppercase font-weight-bold"
+          elevation="6"
+        >
+          See Next Launch Countdown
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <v-dialog v-model="showCountdown" max-width="460" persistent>
+      <v-card class="glass-card pa-6 text-center">
+        <v-card-title class="modal-title justify-center">
+          Next Launch Countdown
+        </v-card-title>
+
+        <v-card-text>
+          <NextLaunchCountdown />
+        </v-card-text>
+
+        <v-card-actions class="justify-center">
+          <v-btn color="cyan lighten-1" dark @click="showCountdown = false" elevation="3">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+  
     <v-row justify="center" class="mb-4" align="center" dense>
       <v-col cols="12" md="3" class="d-flex justify-center">
         <LaunchYearFilter
@@ -61,6 +94,8 @@ import '@/assets/css/LaunchesPage.css'
 import { ref, computed } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
+
+import NextLaunchCountdown from '@/components/NextLaunchCountdown.vue' 
 
 import LaunchYearFilter from '@/components/LaunchYearFilter.vue'
 import LaunchSortControl from '@/components/LaunchSortControl.vue'
@@ -164,4 +199,6 @@ function openDetails(launch: Launch) {
   rocket.value = r
   showDialog.value = true
 }
+
+const showCountdown = ref(false)
 </script>
