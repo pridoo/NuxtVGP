@@ -1,35 +1,42 @@
-# Nuxt 3 / Vuetify / Graphql / Pinia Starter
+# SpaceX Launches Explorer
 
-This template incorporates the utilization of Nuxt3, Vuetify, GraphQL, and Pinia to create a robust foundation
+A Nuxt 3 app built with Vuetify, Apollo GraphQL, Pinia (with state persistence), and TypeScript to explore SpaceX launches, rockets, and manage favorite rockets.
 
-### To learn more, you can check out:
+---
 
--[Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction)
+## Project Overview
 
--[Vuetify 3 documentation](https://next.vuetifyjs.com/)
+This project connects to the public SpaceX GraphQL API to display upcoming and past launches, rocket details, and allows users to save favorite rockets with persistent state stored in IndexedDB via Pinia plugin. The app is built with Nuxt 3, leveraging Vue 3 Composition API and Vuetify for UI.
 
--[GraphQL documentation](https://graphql.org/)
+---
 
--[Pinia documentation](https://pinia.vuejs.org/)
+## Features
 
-## Linters
+- List all SpaceX launches with mission name, launch date, launch site, rocket name, and details.
+- Filter launches by year using a composable.
+- Sort launches by launch date (ascending/descending).
+- Dynamic pages showing detailed rocket information.
+- Global state management with Pinia for managing favorites.
+- Persistence of favorites list in IndexedDB using `pinia-plugin-state-persistence`.
+- Responsive UI with Vuetify.
+- GraphQL queries handled by Apollo Client.
+- Middleware to redirect unknown routes (if implemented).
+- Deployed to Vercel for easy access.
 
-The template has been pre-configured with state-of-the-art linters like eslint, stylelint, prettier, and commitizen to bolster code legibility and standardization
+---
 
-## Setup
+## Setup Instructions
 
-Make sure to install the dependencies:
+### Prerequisites
+
+- Node.js >= 16.x
+- npm or yarn
+- Vercel account (for deployment)
+
+### Local Development
+
+1. Clone the repository:
 
 ```bash
-pnpm install
-```
-
-## Development Server
-
-Start the development server on http://localhost:3000
-
-```bash
-pnpm dev
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+git clone https://github.com/yourusername/your-repo-name.git
+cd your-repo-name
