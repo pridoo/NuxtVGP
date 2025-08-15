@@ -15,14 +15,12 @@ export const useFavoritesStore = defineStore('favorites', {
   state: () => ({
     favorites: [] as Rocket[],
   }),
-  getters: {
-    isFavorite: (state) => {
-      return (rocketId: string) => state.favorites.some(r => r.id === rocketId)
-    }
-  },
   actions: {
+    isFavorite(rocketId: string): boolean {
+      return this.favorites.some(r => r.id === rocketId)
+    },
     addFavorite(rocket: Rocket) {
-      if (!this.favorites.find(r => r.id === rocket.id)) {
+      if (!this.isFavorite(rocket.id)) {
         this.favorites.push(rocket)
       }
     },
@@ -38,6 +36,7 @@ export const useFavoritesStore = defineStore('favorites', {
     },
     clearFavorites() {
       this.favorites = []
-    }
-  }
+    },
+  },
+  persist: true, // Use the persistence plugin configured globally
 })

@@ -40,9 +40,11 @@
 	"dependencies": {
 		"@mdi/font": "^7.2.96",
 		"@nuxtjs/apollo": "^5.0.0-alpha.15",
-		"@pinia/nuxt": "^0.5.1",
-		"@vue/apollo-composable": "^4.2.2",
+		"@pinia/nuxt": "^0.11.2",
 		"graphql": "^16.11.0",
+		"localforage": "^1.10.0",
+		"pinia": "^3.0.3",
+		"pinia-plugin-state-persistence": "^1.10.3",
 		"sass": "^1.68.0",
 		"vue-router": "^4.0.13",
 		"vuetify": "^3.9.5"

@@ -7,15 +7,21 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 
+// Define the Launch type matching the GraphQL data
 interface Launch {
   id: string
   mission_name: string
   launch_date_utc: string
 }
 
+// Define the expected result structure from the query
+interface GetNextLaunchResult {
+  launchesUpcoming: Launch[]
+}
+
+// GraphQL query to get the next upcoming launch
 const GET_NEXT_LAUNCH = gql`
   query GetNextLaunch {
     launchesUpcoming(limit: 1, sort: "launch_date_utc", order: "asc") {
@@ -26,10 +32,13 @@ const GET_NEXT_LAUNCH = gql`
   }
 `
 
-const { result } = useQuery(GET_NEXT_LAUNCH)
+// Use Nuxt Apollo composable with typed data
+const { data } = await useAsyncQuery<GetNextLaunchResult>(GET_NEXT_LAUNCH)
 
-const nextLaunch = computed<Launch | null>(() => result.value?.launchesUpcoming?.[0] || null)
+// Compute the next launch or null if none found
+const nextLaunch = computed<Launch | null>(() => data.value?.launchesUpcoming?.[0] || null)
 
+// Countdown text
 const countdown = ref('Loading...')
 
 let countdownInterval: number | null = null
@@ -44,7 +53,7 @@ function updateCountdown() {
   const now = Date.now()
   const diff = launchTime - now
 
-  if (diff <= -60000) { // 1 minute past launch
+  if (diff <= -60000) {
     countdown.value = 'Launch already happened'
     if (countdownInterval) clearInterval(countdownInterval)
     return
